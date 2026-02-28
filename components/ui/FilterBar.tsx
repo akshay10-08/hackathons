@@ -19,7 +19,7 @@ interface FilterBarProps {
 
 const STATUSES = ["All", "live", "upcoming", "closing-soon", "past"];
 const MODES = ["All", "online", "offline", "hybrid"];
-const SOURCES = ["All", "devfolio", "dorahacks", "hackerearth", "ethglobal", "devpost", "solana", "encode", "lablab"];
+const SOURCES = ["All", "devfolio", "dorahacks", "hackerearth", "ethglobal", "devpost", "solana", "encode", "lablab", "hackclub", "mlh"];
 
 export function FilterBar(props: FilterBarProps) {
   const [showAdvanced, setShowAdvanced] = useState(false);
