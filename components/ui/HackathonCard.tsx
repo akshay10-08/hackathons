@@ -25,6 +25,7 @@ function useCountdown(targetDate: string) {
       return `${mins}m left`;
     };
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTimeLeft(calculate());
     const interval = setInterval(() => setTimeLeft(calculate()), 60000);
     return () => clearInterval(interval);
@@ -47,6 +48,7 @@ export function HackathonCard({ hackathon }: { hackathon: Hackathon }) {
 
   useEffect(() => {
     const saved = localStorage.getItem(`bookmark-${hackathon.id}`);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setBookmarked(true);
   }, [hackathon.id]);
 

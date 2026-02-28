@@ -16,7 +16,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredAndSorted = useMemo(() => {
-    let result = hackathons.filter(h => {
+    const result = hackathons.filter(h => {
       // Search
       if (searchQuery) {
         const q = searchQuery.toLowerCase();
