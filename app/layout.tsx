@@ -15,7 +15,29 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AllHacks – Discover Every Hackathon",
-  description: "AllHacks aggregates live and upcoming hackathons from 8+ platforms. Find your next hackathon at allhacks.xyz.",
+  description: "AllHacks aggregates live and upcoming hackathons from 8+ platforms in one place. Find your next hackathon at allhacks.xyz.",
+  openGraph: {
+    title: "AllHacks – Discover Every Hackathon",
+    description: "Aggregating live and upcoming hackathons from Devfolio, MLH, Hack Club, Devpost, and more. Stop searching, start building.",
+    url: "https://allhacks.xyz",
+    siteName: "AllHacks",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "AllHacks - Discover Every Hackathon",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AllHacks – Discover Every Hackathon",
+    description: "Aggregating live and upcoming hackathons from Devfolio, MLH, Hack Club, Devpost, and more.",
+    images: ["/og-image.png"],
+  },
 };
 
 export default function RootLayout({
