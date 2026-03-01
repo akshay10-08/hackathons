@@ -17,7 +17,7 @@ export function Hero() {
       {/* Hero Title */}
       <div className="py-12 sm:py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto text-center">
         <div className="inline-block bg-neo-yellow text-black font-bold px-4 py-1.5 border-2 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] mb-6 uppercase tracking-wider text-xs transform -rotate-1">
-          ✨ Updated March 2026
+          ✨ Updated in Real-Time
         </div>
         <h1 className="text-4xl sm:text-5xl md:text-7xl font-black uppercase tracking-tighter mb-4 leading-[0.9] text-black dark:text-white">
           Hackathon
