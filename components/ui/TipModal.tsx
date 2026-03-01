@@ -2,36 +2,66 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Copy, Check, Heart, Rocket, Trophy } from "lucide-react";
+import { X, Copy, Check, Heart } from "lucide-react";
+import Image from "next/image";
 import {
-  BADGE_INFO,
   MONTHLY_GOAL,
-  WALLET_ADDRESS,
-  getBadgeTier,
   addSupporter,
   getTotalCount,
   getMonthlyRaised,
-  type BadgeTier,
-  type Supporter,
 } from "@/lib/tipping";
 
 const PRESETS = [5, 10, 25];
 
-// ─── Simple QR-style pattern (visual placeholder) ───────────────────────────
-function WalletQR() {
-  // Generate a deterministic grid pattern from the wallet address
-  const cells: boolean[] = [];
-  for (let i = 0; i < 64; i++) {
-    cells.push(WALLET_ADDRESS.charCodeAt(i % WALLET_ADDRESS.length) % 3 !== 0);
+// ─── Crypto Wallets ─────────────────────────────────────────────────────────
+type CryptoWallet = {
+  id: string;
+  name: string;
+  symbol: string;
+  address: string;
+  qr: string;
+  color: string;
+  icon: string;
+};
+
+const WALLETS: CryptoWallet[] = [
+  {
+    id: "eth",
+    name: "Ethereum",
+    symbol: "ETH",
+    address: "0x7d32C501BA6C98A5AC1B6696275Ed8516B7779A3",
+    qr: "/qr-ethereum.jpg",
+    color: "#627EEA",
+    icon: "💎"
+  },
+  {
+    id: "btc",
+    name: "Bitcoin",
+    symbol: "BTC",
+    address: "bc1qdxqjvy4elna4p3ngkhq3mxvwr4mn88r95pdeqm",
+    qr: "/qr-bitcoin.jpg",
+    color: "#F7931A",
+    icon: "₿"
+  },
+  {
+    id: "sol",
+    name: "Solana",
+    symbol: "SOL",
+    address: "DrNTMrmbG7SvuorjutVarcsFqBW8JdKV1NhNvosQgG4",
+    qr: "/qr-solana.jpg",
+    color: "#14F195",
+    icon: "◎"
+  },
+  {
+    id: "matic",
+    name: "Polygon",
+    symbol: "MATIC",
+    address: "0x7d32C501BA6C98A5AC1B6696275Ed8516B7779A3",
+    qr: "/qr-polygon.jpg",
+    color: "#8247E5",
+    icon: "⬡"
   }
-  return (
-    <div className="inline-grid grid-cols-8 gap-[2px] p-2 bg-white border-2 border-black">
-      {cells.map((filled, i) => (
-        <div key={i} className={`w-2.5 h-2.5 ${filled ? "bg-black" : "bg-white"}`} />
-      ))}
-    </div>
-  );
-}
+];
 
 // ─── Animated Counter ───────────────────────────────────────────────────────
 function AnimatedNumber({ value }: { value: number }) {
@@ -70,12 +100,12 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const [selectedAmount, setSelectedAmount] = useState<number>(10);
   const [customAmount, setCustomAmount] = useState("");
   const [isCustom, setIsCustom] = useState(false);
+  const [selectedCrypto, setSelectedCrypto] = useState<CryptoWallet>(WALLETS[0]);
   const [copied, setCopied] = useState(false);
   const [step, setStep] = useState<"select" | "confirm" | "done">("select");
   const [displayName, setDisplayName] = useState("");
   const [anonymous, setAnonymous] = useState(false);
   const [message, setMessage] = useState("");
-  const [earnedBadge, setEarnedBadge] = useState<BadgeTier | null>(null);
   const [totalCount, setTotalCount] = useState(0);
   const [monthlyRaised, setMonthlyRaised] = useState(0);
 
@@ -84,7 +114,6 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
       setTotalCount(getTotalCount());
       setMonthlyRaised(getMonthlyRaised());
       setStep("select");
-      setEarnedBadge(null);
       setCopied(false);
     }
   }, [isOpen]);
@@ -92,20 +121,19 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
   const currentAmount = isCustom ? (Number(customAmount) || 0) : selectedAmount;
 
   const copyAddress = async () => {
-    await navigator.clipboard.writeText(WALLET_ADDRESS);
+    await navigator.clipboard.writeText(selectedCrypto.address);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   const handleConfirmTip = () => {
     if (currentAmount < 1) return;
-    const supporter = addSupporter({
+    addSupporter({
       displayName: anonymous ? "Anonymous" : (displayName || "Anonymous"),
       amount: currentAmount,
       anonymous,
       message: message || undefined,
     });
-    setEarnedBadge(supporter.badgeTier);
     setTotalCount(getTotalCount());
     setMonthlyRaised(getMonthlyRaised());
     setStep("done");
@@ -202,16 +230,51 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                     </div>
                   </div>
 
+                  {/* Crypto Selector */}
+                  <div>
+                    <label className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 mb-2 block">
+                      💳 Select Payment Method
+                    </label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {WALLETS.map((wallet) => (
+                        <button
+                          key={wallet.id}
+                          onClick={() => { setSelectedCrypto(wallet); setCopied(false); }}
+                          className={`p-3 border-[3px] transition-all cursor-pointer flex flex-col items-center gap-1 ${
+                            selectedCrypto.id === wallet.id
+                              ? "border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] -translate-y-0.5"
+                              : "border-black/20 dark:border-white/20 hover:border-black hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,0.5)] hover:-translate-y-0.5"
+                          }`}
+                          style={{
+                            backgroundColor: selectedCrypto.id === wallet.id ? wallet.color + "20" : "transparent"
+                          }}
+                        >
+                          <span className="text-2xl">{wallet.icon}</span>
+                          <span className="text-[9px] font-black uppercase text-black dark:text-white">{wallet.symbol}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Wallet */}
                   <div className="border-[3px] border-black dark:border-white/20 p-4 bg-black/[0.03] dark:bg-white/[0.03]">
                     <label className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 mb-3 block">
-                      💳 Wallet Address
+                      {selectedCrypto.name} ({selectedCrypto.symbol})
                     </label>
                     <div className="flex items-center gap-3 mb-3">
-                      <WalletQR />
+                      {/* QR Code */}
+                      <div className="border-2 border-black bg-white p-1">
+                        <Image
+                          src={selectedCrypto.qr}
+                          alt={`${selectedCrypto.name} QR Code`}
+                          width={80}
+                          height={80}
+                          className="w-20 h-20"
+                        />
+                      </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-mono font-bold text-black/70 dark:text-white/70 break-all leading-relaxed">
-                          {WALLET_ADDRESS}
+                          {selectedCrypto.address}
                         </p>
                         <button
                           onClick={copyAddress}
@@ -222,7 +285,7 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                       </div>
                     </div>
                     <p className="text-[10px] font-medium text-black/40 dark:text-white/40">
-                      Send the selected amount to the wallet above. After payment, click the confirm button below.
+                      Send the selected amount in {selectedCrypto.symbol} to the wallet above. After payment, click the confirm button below.
                     </p>
                   </div>
 
@@ -305,46 +368,34 @@ export function TipModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
                 </>
               )}
 
-              {/* ─── Step 3: Badge Reveal ─── */}
-              {step === "done" && earnedBadge && (
+              {/* ─── Step 3: Thank You ─── */}
+              {step === "done" && (
                 <motion.div
-                  className="text-center py-4"
+                  className="text-center py-8"
                   initial={{ scale: 0.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: "spring", damping: 15 }}
                 >
                   <motion.div
                     className="text-6xl mb-4"
-                    animate={{ rotate: [0, -10, 10, -10, 0], scale: [1, 1.2, 1] }}
+                    animate={{ scale: [1, 1.2, 1] }}
                     transition={{ duration: 0.6 }}
                   >
-                    {BADGE_INFO[earnedBadge].emoji}
+                    🎉
                   </motion.div>
-                  <h3 className="text-xl font-black uppercase text-black dark:text-white mb-1">
+                  <h3 className="text-3xl font-black uppercase text-black dark:text-white mb-3">
                     Thank You!
                   </h3>
-                  <p className="text-sm font-bold text-black/60 dark:text-white/60 mb-4">
-                    You earned the badge:
+                  <p className="text-base font-bold text-black/70 dark:text-white/70 mb-2 leading-relaxed">
+                    Your contribution means a lot to this 16-year-old guy working on tech.
                   </p>
-                  <div
-                    className="inline-block px-5 py-2 font-black uppercase text-sm border-[3px] border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                    style={{ backgroundColor: BADGE_INFO[earnedBadge].color }}
-                  >
-                    {BADGE_INFO[earnedBadge].emoji} {BADGE_INFO[earnedBadge].label}
-                  </div>
-
-                  <div className="mt-6">
-                    <a
-                      href="/supporters"
-                      className="text-xs font-bold uppercase text-neo-blue hover:underline"
-                    >
-                      View Community Wall →
-                    </a>
-                  </div>
+                  <p className="text-sm font-medium text-black/50 dark:text-white/50 mb-6">
+                    It helps keep this platform running and improving.
+                  </p>
 
                   <button
                     onClick={onClose}
-                    className="mt-4 w-full py-3 font-black uppercase text-sm border-[3px] border-black bg-neo-yellow text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all cursor-pointer"
+                    className="w-full py-3 font-black uppercase text-sm border-[3px] border-black bg-neo-yellow text-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 transition-all cursor-pointer"
                   >
                     Close
                   </button>
