@@ -13,15 +13,19 @@ export function FuelButton() {
       {/* Floating Button */}
       <motion.button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 px-5 py-3 bg-neo-yellow text-black border-[3px] border-black font-black uppercase text-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-1 active:translate-y-0 active:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all cursor-pointer fuel-pulse"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-6 py-3.5 text-white font-black uppercase text-sm border-[3px] border-black hover:-translate-y-1 active:translate-y-0 transition-all cursor-pointer fuel-pulse"
+        style={{
+          background: "linear-gradient(135deg, #FF2D7B 0%, #FF6B35 50%, #FFD500 100%)",
+          boxShadow: "4px 4px 0px 0px rgba(0,0,0,1), 0 0 20px rgba(255,45,123,0.4)",
+        }}
         initial={{ y: 100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 1, type: "spring", damping: 15 }}
-        whileHover={{ scale: 1.05 }}
+        whileHover={{ scale: 1.08 }}
       >
-        <Rocket size={18} strokeWidth={2.5} className="animate-bounce" />
-        <span className="hidden sm:inline">Fuel This Platform</span>
-        <span className="sm:hidden">Fuel</span>
+        <Rocket size={20} strokeWidth={2.5} className="animate-bounce drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]" />
+        <span className="hidden sm:inline drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Fuel This Platform</span>
+        <span className="sm:hidden drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]">Fuel</span>
       </motion.button>
 
       {/* Modal */}
